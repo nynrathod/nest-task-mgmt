@@ -18,3 +18,36 @@
     }
 
 }
+
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    padding: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #D0D5DD;
+    border-radius: 8px;
+}
+
+::selection {
+    background: #D0D5DD;
+}
+
+
+/* Define the sliding out animation */
+.task-delete {
+    animation: slideOut 0.3s ease-in-out forwards;
+}
+
+@keyframes slideOut {
+    0% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-100%); /* Slide out to the left */
+    }
+}

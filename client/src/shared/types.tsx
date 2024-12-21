@@ -1,12 +1,15 @@
 export interface User {
-  name: string;
+  firstName: string;
   email: string;
+  id: number;
 }
 
 export interface Task {
-  id?: string;
+  id?: number;
   title: string;
-  due: string | null;
-  done: boolean;
+  reminder: string | null;
+  status: boolean;
+  processing?: true;
   assignee?: User;
+  tempId?: number;
 }
