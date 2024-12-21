@@ -2,10 +2,7 @@ import Network from "../network";
 import Config from "./PathConfig.ts";
 import { Task } from "../../types.tsx";
 
-// Add a new task
 export const createTask = async (task: Task) => {
-  console.log("ADasdtask", task);
-  // Remove the status field from the task object
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { processing, ...taskWithoutProcessing } = task;
   const taskForApi = {
@@ -14,11 +11,7 @@ export const createTask = async (task: Task) => {
       firstName: task.assignee?.firstName,
       email: task.assignee?.email,
       id: task.assignee?.id,
-    }, // Use the
-    // assignee's ID
-    // instead of the
-    // full
-    // User object
+    },
   };
 
   return await Network.post({
@@ -28,7 +21,7 @@ export const createTask = async (task: Task) => {
 };
 
 export const updatetask = async (task: any) => {
-  console.log("updatedhelo", task);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { processing, ...taskWithoutProcessing } = task;
   return await Network.put({
     url: Config.api.task.updateTask(task.id),
@@ -37,8 +30,6 @@ export const updatetask = async (task: any) => {
 };
 
 export const deleteTask = async (task: any) => {
-  console.log("deletehelo", task);
-
   return await Network.delete({
     url: Config.api.task.deleteTask(task),
   });
@@ -51,8 +42,6 @@ export const updateTaskStatus = async ({
   id: number;
   status: boolean;
 }) => {
-  console.log("statusuodate", id);
-
   return await Network.put({
     url: Config.api.task.updateStatusTask(id),
     body: {
@@ -62,8 +51,6 @@ export const updateTaskStatus = async ({
 };
 
 export const getAllTask = async () => {
-  // console.log("updatedhelo", task);
-
   return await Network.get({
     url: Config.api.task.getallTasks,
   });

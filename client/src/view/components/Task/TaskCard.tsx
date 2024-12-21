@@ -1,19 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { BellIcon, TrashIcon } from "@heroicons/react/24/outline";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-
 import { CheckIcon } from "@heroicons/react/16/solid";
+
 import { Task, User } from "../../../shared/types";
 import UserDropdown from "./UserDropdown";
-import { useMutation } from "@tanstack/react-query";
 import { deleteTask, updatetask } from "../../../shared/services/api/task.ts";
+import "react-datepicker/dist/react-datepicker.css";
+import CardLoader from "../widget/CardLoader.tsx";
 
 interface TaskCardProps {
   task: Task;
   toggleStatus: (id: number, checked: boolean) => void;
   updateTask: (task: Task) => void;
-  isEditing: string | null;
+  isEditing: number | null;
   setIsEditing: (id: number | null) => void;
   users: any;
   updateStatus: (task: Task) => void;
@@ -27,62 +28,50 @@ const TaskCard = ({
   isEditing,
   setIsEditing,
   users,
-  updateStatus,
   delteTask,
 }: TaskCardProps) => {
   const [editedTask, setEditedTask] = useState<Task>({ ...task });
   const [originalTask, setOriginalTask] = useState<Task>({ ...task });
   const [isDeleted, setIsDeleted] = useState(false);
-  useEffect(() => {
-    console.log("ASdasllll", task);
-    setEditedTask({ ...task });
-    setOriginalTask({ ...task });
-  }, [task]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [assignee, setAssignee] = useState<string>(
+    editedTask.assignee?.firstName || "",
+  );
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
-  const handleDeleteClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsDeleted(true); // Trigger the deletion animation
-    setTimeout(() => {
-      mutateDeleteTask(task.id); // After animation, delete the task
-    }, 300); // Match the duration of the animation
-  };
   const { mutate: mutateDeleteTask } = useMutation({
     mutationFn: deleteTask,
     onSuccess: (newTask: any) => {
-      console.log("asdasdanewtask", newTask);
-
       delteTask(newTask.id);
-      // console.log("ASdafdsgdfdf", newTask);
-      // const helloTask = {
-      //   ...newTask,
-      //   status: "yes",
-      // };
-      // console.log("newTaskwwupdate", newTask);
-      // updateStatus(helloTask);
     },
   });
 
   const { mutate: mutateUpdateTask } = useMutation({
     mutationFn: updatetask,
     onSuccess: (newTask: any) => {
-      console.log("ASdafdsgdfdf", newTask);
       const helloTask = {
         ...newTask,
       };
       delete helloTask.processing;
-      console.log("newTaskwwupdate", helloTask);
       updateTask(helloTask);
     },
   });
 
+  const handleDeleteTask = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDeleted(true);
+    setTimeout(() => {
+      mutateDeleteTask(task.id);
+    }, 300);
+  };
+
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log("editedTask", editedTask);
 
     const updatedTask: Task = {
       ...editedTask,
       processing: true,
-
       reminder:
         editedTask.reminder && !isNaN(new Date(editedTask.reminder).getTime())
           ? new Date(editedTask.reminder).toISOString()
@@ -99,24 +88,10 @@ const TaskCard = ({
     setIsEditing(null);
   };
 
-  const handleEditClick = (e: React.MouseEvent) => {
+  const handleEditTask = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (task.id) setIsEditing(task?.id);
   };
-
-  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
-  const [assignee, setAssignee] = useState<string>(
-    editedTask.assignee?.firstName || "",
-  );
-
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
-
-  // const users: User[] = [
-  //   { name: "John Doe", email: "john@example.com" },
-  //   { name: "Jane Smith", email: "jane@example.com" },
-  //   { name: "Alice Johnson", email: "alice@example.com" },
-  //   { name: "Bob Lee", email: "bob@example.com" },
-  // ];
 
   const handleUserSelect = (user: User) => {
     setAssignee(user.firstName);
@@ -127,8 +102,6 @@ const TaskCard = ({
     setIsDropdownOpen(false);
   };
 
-  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
-
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -138,60 +111,34 @@ const TaskCard = ({
         setIsDropdownOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   useEffect(() => {
-    console.log("hellotask", task);
+    setEditedTask({ ...task });
+    setOriginalTask({ ...task });
   }, [task]);
 
   return (
     <>
       {task.processing ? (
-        <div className="relative rounded-lg group">
-          <div
-            className={`bg-gray-800 animate-pulse relative p-4 block shadow-lg justify-between items-center transition-all duration-300`}
-          >
-            <div className="flex items-center space-x-4">
-              <div className="w-6 h-6 rounded-full bg-gray-600 animate-pulse"></div>
-
-              <div className="flex justify-between w-full">
-                <div>
-                  <div className="bg-gray-600 w-[300px] rounded-lg animate-pulse h-6" />
-                  <div>
-                    <div className=" mt-2">
-                      <div className="h-4 w-28 rounded-lg bg-gray-600 animate-pulse" />
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 rounded-full animate-pulse bg-gray-600 " />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CardLoader />
       ) : (
         <div
           className={`relative rounded-lg group ${isDeleted ? "task-delete" : ""} transition-all duration-300`}
           onClick={(e) => {
-            if (!task.status) {
-              handleEditClick(e);
-            } else {
-              e.stopPropagation();
-            }
+            if (!task.status) handleEditTask(e);
+            else e.stopPropagation();
           }}
         >
           <TrashIcon
             className="size-7 opacity-0 hover:cursor-pointer rounded-full bg-gray-950/30 p-2 group-hover:opacity-100 transition-all duration-75 absolute top-1 right-1 z-10"
             onClick={(e) => {
               e.stopPropagation();
-              handleDeleteClick(e);
+              handleDeleteTask(e);
             }}
           />
           <div
@@ -205,7 +152,7 @@ const TaskCard = ({
                   type="checkbox"
                   id={task.title}
                   checked={task.status ?? false}
-                  onChange={(e) => toggleStatus(task.id, e.target.checked)}
+                  onChange={(e) => toggleStatus(task.id!, e.target.checked)}
                   className="hidden "
                   onClick={(e) => e.stopPropagation()}
                 />

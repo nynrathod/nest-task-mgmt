@@ -13,23 +13,19 @@ export class RemindersGateway
   @WebSocketServer()
   private readonly server: Server;
 
-  // Store user sockets by userId
-  private userSockets: { [userId: string]: Socket } = {}; // Changed to string
+  private userSockets: { [userId: string]: Socket } = {};
 
-  // This function handles the WebSocket connection
   handleConnection(client: Socket): void {
-    const userId = client.handshake.query.userId as string; // Ensure it's treated as string
+    const userId = client.handshake.query.userId as string;
     if (userId) {
-      this.userSockets[userId] = client; // Store the socket by userId
+      this.userSockets[userId] = client;
       console.log(`User connected with ID: ${userId}`);
     } else {
       console.error('User connection failed: userId is missing');
     }
   }
 
-  // This function sends the reminder to the correct user
   sendReminder(taskId: number, userId: string, title: string): void {
-    // Ensure userId is a string
     const socket = this.userSockets[userId];
     if (socket) {
       console.log(`Sending reminder to user ${userId} for task ${taskId}`);
@@ -44,11 +40,10 @@ export class RemindersGateway
     }
   }
 
-  // This function handles the disconnection and removes the user from the sockets list
   handleDisconnect(client: Socket): void {
-    const userId = client.handshake.query.userId as string; // Ensure it's treated as string
+    const userId = client.handshake.query.userId as string;
     if (userId) {
-      delete this.userSockets[userId]; // Remove the user socket
+      delete this.userSockets[userId];
       console.log(`User disconnected with ID: ${userId}`);
     } else {
       console.error('User disconnection failed: userId is missing');

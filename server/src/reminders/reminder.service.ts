@@ -6,7 +6,6 @@ import { TaskWithTempId } from '../tasks/interface/task-interface';
 export class TaskReminderService {
   constructor(private readonly remindersQueue: RemindersQueue) {}
 
-  // Method to check and schedule reminder
   async scheduleReminderIfExists(task: TaskWithTempId) {
     if (task.reminder && !isNaN(new Date(task.reminder).getTime())) {
       console.log('Reminder found:', task.reminder);

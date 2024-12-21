@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
+import { APP_GUARD } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { User } from './entities/user.entity';
 import { AuthGuard } from './auth.guard';
-import { APP_GUARD } from '@nestjs/core';
-import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -27,8 +27,8 @@ import { ConfigService } from '@nestjs/config';
   providers: [
     AuthService,
     JwtStrategy,
-    AuthGuard, // Ensure AuthGuard is part of the providers array
-    { provide: APP_GUARD, useClass: AuthGuard }, // Register AuthGuard globally using APP_GUARD
+    AuthGuard,
+    { provide: APP_GUARD, useClass: AuthGuard },
   ],
 })
 export class AuthModule {}

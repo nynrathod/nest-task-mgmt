@@ -5,7 +5,7 @@ interface UserDropdownProps {
   isDropdownOpen: boolean;
   onSelectUser: (user: User) => void;
   users: User[];
-  onToggleDropdown: () => void; // Callback to toggle dropdown state
+  onToggleDropdown: () => void;
 }
 
 const UserDropdown: React.FC<UserDropdownProps> = ({
@@ -26,7 +26,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
   const handleUserSelect = (user: User) => {
     console.log("asdasfsd", user);
     onSelectUser(user);
-    onToggleDropdown(); // Close the dropdown when a user is selected
+    onToggleDropdown();
   };
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
         dropdownRef.current &&
         !dropdownRef.current.contains(e.target as Node)
       ) {
-        onToggleDropdown(); // Close the dropdown when clicked outside
+        onToggleDropdown();
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -43,10 +43,6 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [onToggleDropdown]);
-
-  useEffect(() => {
-    console.log("usersss", filteredUsers);
-  }, [filteredUsers]);
 
   return (
     <div className="relative">

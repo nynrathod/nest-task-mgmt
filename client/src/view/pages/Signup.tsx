@@ -3,11 +3,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { Link, useNavigate } from "react-router-dom";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { SignupApi } from "../../shared/services/api/user";
-import { Link, useNavigate } from "react-router-dom";
 
-// Define the validation schema using Zod
 const signupSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
@@ -32,24 +31,21 @@ const Signup = () => {
     resolver: zodResolver(signupSchema),
   });
 
-  // Handle signup mutation
-  const { mutate, isPending } = useMutation({
-    mutationFn: SignupApi, // The function that handles the API call
+  const { mutate, isLoading } = useMutation({
+    mutationFn: SignupApi,
     onSuccess: () => {
       navigate("/login");
-      reset(); // Reset form fields on success
+      reset();
     },
     onError: (error: any) => {
       if (error?.data?.errorCode == "ERR_001") {
         setUserExits(true);
-        console.log("Signup failed:", error);
       }
     },
   });
 
-  // Handle form submission
   const onSubmit = (data: SignupFormData) => {
-    mutate(data); // Pass form data to mutate
+    mutate(data);
   };
 
   return (
@@ -61,7 +57,6 @@ const Signup = () => {
         >
           <h2 className="text-2xl font-semibold mb-6 text-center">Sign Up</h2>
 
-          {/* First Name */}
           <input
             type="text"
             placeholder="First Name"
@@ -72,7 +67,6 @@ const Signup = () => {
             <p className="text-red-500 text-sm">{errors.firstName.message}</p>
           )}
 
-          {/* Last Name */}
           <input
             type="text"
             placeholder="Last Name"
@@ -83,7 +77,6 @@ const Signup = () => {
             <p className="text-red-500 text-sm">{errors.lastName.message}</p>
           )}
 
-          {/* Email */}
           <input
             type="email"
             placeholder="Email"
@@ -94,7 +87,6 @@ const Signup = () => {
             <p className="text-red-500 text-sm">{errors.email.message}</p>
           )}
 
-          {/* Password */}
           <div className="relative">
             <input
               type={passwordVisible ? "text" : "password"}
@@ -118,13 +110,12 @@ const Signup = () => {
             <p className="text-red-500 text-sm">{errors.password.message}</p>
           )}
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-black text-white py-2 rounded-md"
-            disabled={isPending}
+            disabled={isLoading}
           >
-            {isPending ? "Signing Up..." : "Sign Up"}
+            {isLoading ? "Signing Up..." : "Sign Up"}
           </button>
           {userExits && (
             <p className="text-red-500 text-center mt-4 text-sm">

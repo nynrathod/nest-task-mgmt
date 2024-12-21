@@ -26,7 +26,7 @@ export class User {
   password: string;
 
   @OneToMany(() => Task, (task) => task.assignee)
-  tasks: Task[]; // Tasks assigned to this user
+  tasks: Task[];
 
   @CreateDateColumn()
   createdAt: Date;

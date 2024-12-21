@@ -14,10 +14,8 @@ export const loginApi = async (data: LoginFormData) => {
   });
 };
 
-// API function
 export const SignupApi = async (data: SignupFormData) => {
   const { firstName, lastName, email, password } = data;
-
   return await Network.post({
     url: Config.api.auth.signup,
     body: {

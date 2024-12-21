@@ -8,8 +8,8 @@ import { RemindersModule } from './reminders/reminders.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Make the config globally available
-      envFilePath: '.env', // Path to the .env file
+      isGlobal: true,
+      envFilePath: '.env',
     }),
     DatabaseModule,
     AuthModule,

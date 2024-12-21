@@ -16,9 +16,7 @@
         left: 100%;
         right: -90%;
     }
-
 }
-
 
 ::-webkit-scrollbar {
     width: 8px;
@@ -35,8 +33,6 @@
     background: #D0D5DD;
 }
 
-
-/* Define the sliding out animation */
 .task-delete {
     animation: slideOut 0.3s ease-in-out forwards;
 }
@@ -48,6 +44,6 @@
     }
     100% {
         opacity: 0;
-        transform: translateX(-100%); /* Slide out to the left */
+        transform: translateX(-100%);
     }
 }

@@ -30,9 +30,9 @@ export class Task {
   @Column({ default: false })
   status: boolean;
 
-  @CreateDateColumn() // Automatically sets the current date/time when the task is created
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ nullable: true }) // Automatically updates the date/time on each update
+  @UpdateDateColumn({ nullable: true })
   updatedAt: Date;
 }

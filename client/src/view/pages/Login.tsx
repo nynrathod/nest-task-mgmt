@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
-import { loginApi } from "../../shared/services/api/user.ts";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router-dom";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { loginApi } from "../../shared/services/api/user.ts";
 import { addItemToLocalstorage } from "../../shared/utilities/common/storage.ts";
 import { StorageItems } from "../../shared/constants/app.ts";
-import { Link, useNavigate } from "react-router-dom";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address").min(1, "Email is required"),
@@ -20,7 +20,6 @@ const Login = () => {
   const [wrongCred, setWrongCred] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -29,27 +28,22 @@ const Login = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  // Use React Query's useMutation for login
-  const { mutate, isPending } = useMutation({
+  const { mutate, isLoading } = useMutation({
     mutationFn: loginApi,
     onSuccess: (data: any) => {
       if (data) {
         addItemToLocalstorage(StorageItems.USER_INFO, data);
-        navigate("/");
+        window.location.href = "/";
       }
-      console.log("Login successful:", data); // Store token or navigate on success
     },
     onError: (error: any) => {
       if (error?.data?.errorCode == "ERR_003") {
         setWrongCred(true);
-        console.error("Login failed:", error); // Handle errors
       }
     },
   });
 
   const onSubmit = (data: LoginFormData) => {
-    console.log();
-    // Call mutate to trigger the login API
     mutate(data);
   };
 
@@ -97,13 +91,12 @@ const Login = () => {
             )}
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-black text-white py-2 rounded-md"
-            disabled={isPending}
+            disabled={isLoading}
           >
-            {isPending ? "Logging In..." : "Login"}
+            {isLoading ? "Logging In..." : "Login"}
           </button>
 
           {wrongCred && (

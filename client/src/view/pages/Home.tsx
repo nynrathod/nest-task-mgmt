@@ -3,6 +3,7 @@ import {
   ArrowRightStartOnRectangleIcon,
   PlusIcon,
 } from "@heroicons/react/24/outline";
+import { toast, ToastContainer } from "react-toastify";
 import TaskCard from "../components/Task/TaskCard.tsx";
 import TaskForm from "../components/Task/TaskForm.tsx";
 import { Task } from "../../shared/types.tsx";
@@ -14,13 +15,13 @@ import {
   getAllTask,
   updateTaskStatus,
 } from "../../shared/services/api/task.ts";
-import { ScaleLoader } from "react-spinners";
 import useWebSocket from "../../shared/utilities/hooks/useWebsocket.ts";
-import { toast, ToastContainer } from "react-toastify";
+import Loader from "../components/widget/Loader.tsx";
 
 const Home = () => {
-  const [isAdding, setIsAdding] = useState<boolean>(false); // Type for isAdding state
-  const [editingTaskId, setEditingTaskId] = useState<number | null>(null); // Type for editingTaskId state
+  const [isAdding, setIsAdding] = useState<boolean>(false);
+  const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const { user } = useAuth();
   const { logout } = useLogout();
@@ -35,99 +36,9 @@ const Home = () => {
     enabled: false,
   });
 
-  const [tasks, setTasks] = useState<Task[]>([]); // Ensure tasks are typed as Task[]
-
-  useEffect(() => {
-    console.log("tasks", tasks);
-  }, [tasks]);
-
-  useEffect(() => {
-    if (tasksResponse.length) {
-      setTasks(tasksResponse);
-    }
-  }, [tasksResponse]);
-
-  const addTask = (newTask: Task) => {
-    console.log("Asdasf", newTask);
-
-    // Ensure newTask is typed as Task
-    const taskWithId: Task = {
-      ...newTask,
-      // id: Date.now(), // Add a unique ID based on the current timestamp
-    };
-    setTasks([taskWithId, ...tasks]);
-  };
-
   const { mutate: mutateStatuUpdate } = useMutation({
     mutationFn: updateTaskStatus,
-    onSuccess: (newTask: any) => {
-      console.log("asdasdanewtask", newTask);
-
-      // console.log("ASdafdsgdfdf", newTask);
-      // const helloTask = {
-      //   ...newTask,
-      //   status: "yes",
-      // };
-      // console.log("newTaskwwupdate", newTask);
-      // updateStatus(helloTask);
-    },
   });
-
-  const toggleTaskStatus = (id: number, checked: boolean) => {
-    console.log("checked", checked, id);
-
-    mutateStatuUpdate({ id: id, status: checked });
-
-    const updatedTasks = tasks.map((task) =>
-      task.id === id ? { ...task, status: !task.status } : task,
-    );
-    console.log("updatedTasks", updatedTasks);
-    setTasks(updatedTasks);
-  };
-
-  const delteTask = (id: number) => {
-    console.log("ASdasd", id);
-    console.log("ASdasdtasks", tasks);
-    // Filter out the task with the given id
-    const updatedTasks = tasks.filter((task) => task.id != id);
-    console.log("updatedTasks", updatedTasks);
-    setTasks(updatedTasks);
-  };
-
-  const updateTask = (updatedTask: Task) => {
-    // Ensure updatedTask is typed as Task
-    const updatedTasks = tasks.map((task) =>
-      task.id === updatedTask.id ? updatedTask : task,
-    );
-    console.log("updatedTasksnew", updatedTasks);
-    setTasks(updatedTasks);
-  };
-
-  const updateStatus = (updatedTask: Task) => {
-    console.log("Updating task:", updatedTask);
-
-    const { tempId } = updatedTask; // Extract tempId from the updated task
-
-    // Find the index of the task with the matching tempId
-    const index = tasks.findIndex((task) => task.tempId === tempId);
-
-    if (index !== -1) {
-      const taskWithoutTempId = { ...updatedTask };
-      delete taskWithoutTempId.tempId;
-      // delete taskWithoutTempId.processing;
-      const updatedTasks = [
-        ...tasks.slice(0, index),
-        taskWithoutTempId,
-        ...tasks.slice(index + 1),
-      ];
-
-      setTasks(updatedTasks);
-
-      console.log("Task updated successfully:", updatedTasks);
-    } else {
-      console.error("Task with tempId not found:", tempId);
-    }
-  };
 
   const { refetch, data: usersResponse } = useQuery({
     queryKey: ["users"],
@@ -135,21 +46,65 @@ const Home = () => {
     enabled: false,
   });
 
+  const addTask = (newTask: Task) => {
+    const taskWithId: Task = {
+      ...newTask,
+    };
+    setTasks([taskWithId, ...tasks]);
+  };
+
+  const toggleTaskStatus = (id: number, checked: boolean) => {
+    mutateStatuUpdate({ id: id, status: checked });
+    const updatedTasks = tasks.map((task) =>
+      task.id === id ? { ...task, status: !task.status } : task,
+    );
+    setTasks(updatedTasks);
+  };
+
+  const delteTask = (id: number) => {
+    const updatedTasks = tasks.filter((task) => task.id != id);
+    setTasks(updatedTasks);
+  };
+
+  const updateTask = (updatedTask: Task) => {
+    const updatedTasks = tasks.map((task) =>
+      task.id === updatedTask.id ? updatedTask : task,
+    );
+    setTasks(updatedTasks);
+  };
+
+  const updateStatus = (updatedTask: Task) => {
+    const { tempId } = updatedTask;
+
+    const index = tasks.findIndex((task) => task.tempId === tempId);
+    if (index !== -1) {
+      const taskWithoutTempId = { ...updatedTask };
+      delete taskWithoutTempId.tempId;
+      const updatedTasks = [
+        ...tasks.slice(0, index),
+        taskWithoutTempId,
+        ...tasks.slice(index + 1),
+      ];
+      setTasks(updatedTasks);
+    }
+  };
+
+  useEffect(() => {
+    if (Array.isArray(tasksResponse) && tasksResponse.length) {
+      setTasks(tasksResponse);
+    }
+  }, [tasksResponse]);
+
   useEffect(() => {
     refetch();
     refetchTask();
   }, []);
 
-  // console.log("helloyser", user);
-  // const userId = 2;
-  const socket = useWebSocket(user.id);
+  const socket = useWebSocket(user && user.id);
 
   useEffect(() => {
     if (socket) {
       socket.on("taskReminder", (data: { message: string; title: string }) => {
-        console.log("mydddd", data);
-        // Display the reminder notification to the user
-        // alert(data.message); // You can replace this with a more sophisticated notification system
         toast(
           <div>
             <div>{data.message}</div>
@@ -209,11 +164,9 @@ const Home = () => {
 
         <div className="max-h-[500px] overflow-auto mt-4 space-y-4">
           {loadingTasks ? (
-            <div className="min-h-[500px] flex justify-center items-center">
-              <ScaleLoader color="#0e8bff" />
-            </div>
+            <Loader />
           ) : (
-            tasks.map((task, index) => (
+            tasks.map((task) => (
               <TaskCard
                 key={task.id}
                 task={task}

@@ -1,4 +1,3 @@
-// src/auth/auth.guard.ts
 import {
   CanActivate,
   ExecutionContext,
@@ -25,7 +24,7 @@ export class AuthGuard implements CanActivate {
     ]);
 
     if (isPublic) {
-      return true; // Skip authentication for public routes
+      return true;
     }
 
     const request = context.switchToHttp().getRequest();
@@ -35,7 +34,6 @@ export class AuthGuard implements CanActivate {
     }
     const jwtSecret = this.configService.get<string>('JWT_SECRET');
     try {
-      // console.log('request', request);
       request['user'] = await this.jwtService.verifyAsync(token, {
         secret: jwtSecret,
       });

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getItemFromLocalStorage } from "../../../shared/utilities/common/storage.ts";
 import { StorageItems } from "../../../shared/constants/app.ts";
 import { isLoggedIn } from "../../../shared/utilities/common/user.ts";
+import Loader from "../widget/Loader.tsx";
 
 function AuthLayout() {
   const [loading, setLoading] = useState(false);
@@ -12,22 +13,11 @@ function AuthLayout() {
 
   useEffect(() => {
     setLoading(true);
-    if (isLoggedIn(user)) {
-      console.log("yesloggedin");
-      navigate("/home");
-    } else {
-      setLoading(false);
-      console.log("nologin");
-    }
+    if (isLoggedIn(user)) navigate("/");
+    else setLoading(false);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="h-screen flex justify-center items-center bg-gray-900 text-white">
-        <span>Loading...</span>
-      </div>
-    );
-  }
+  if (loading) return <Loader />;
 
   return (
     <div>

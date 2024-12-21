@@ -46,16 +46,16 @@ class Network {
 
   delete = async (request: NetworkRequest) => {
     return this.client.delete(request.url, {
-      params: request.params, // Query parameters for the URL
-      headers: request.headers, // Custom headers, if any
+      params: request.params,
+      headers: request.headers,
     });
   };
 
   attachAuthToken = async () => {
     const user = getItemFromLocalStorage(StorageItems.USER_INFO, "object");
-    console.log("Retrieved user info:", user); // This will help in debugging
+    console.log("Retrieved user info:", user);
     if (user && user.accessToken) {
-      this.client.defaults.headers.common.Authorization = `Bearer ${user.accessToken}`; // Ensure you're using the correct token
+      this.client.defaults.headers.common.Authorization = `Bearer ${user.accessToken}`;
     }
   };
 

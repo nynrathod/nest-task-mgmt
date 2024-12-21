@@ -19,7 +19,7 @@ import { TaskReminderService } from '../reminders/reminder.service';
 export class TasksController {
   constructor(
     private readonly tasksService: TasksService,
-    private readonly taskReminderService: TaskReminderService, // Inject the service
+    private readonly taskReminderService: TaskReminderService,
   ) {}
 
   @Post()
@@ -29,14 +29,12 @@ export class TasksController {
   ): Promise<TaskWithTempId> {
     const task = await this.tasksService.create(createTaskDto, req.user);
     await this.taskReminderService.scheduleReminderIfExists(task);
-    console.log('in last');
     return task;
   }
 
-  // In your controller
   @Get()
   async findAll(@Request() req): Promise<Task[]> {
-    const userId = req.user.id; // Assuming user ID is available in the request object (e.g., from JWT token)
+    const userId = req.user.id;
     return this.tasksService.findAll(userId);
   }
 
@@ -50,9 +48,7 @@ export class TasksController {
     @Param('id') id: number,
     @Body() updateTaskDto: UpdateTaskDto,
   ): Promise<TaskWithTempId> {
-    // Use TaskWithTempId in the return type
     const task = await this.tasksService.update(id, updateTaskDto);
-    console.log('updating task', task);
     await this.taskReminderService.scheduleReminderIfExists(task);
     return task;
   }

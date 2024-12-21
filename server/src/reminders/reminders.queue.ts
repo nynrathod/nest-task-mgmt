@@ -16,7 +16,7 @@ export class RemindersQueue {
   ): Promise<void> {
     await this.reminderQueue.add(
       'sendReminder',
-      { taskId, assigneeId, title }, // Pass the assigneeId to notify the right user
+      { taskId, assigneeId, title },
       { delay: reminderTime.getTime() - Date.now() },
     );
   }

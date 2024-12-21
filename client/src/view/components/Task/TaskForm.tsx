@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import DatePicker from "react-datepicker";
+import { useMutation } from "@tanstack/react-query";
 import "react-datepicker/dist/react-datepicker.css";
 import { CalendarDateRangeIcon } from "@heroicons/react/24/outline";
 import { Task, User } from "../../../shared/types.tsx";
 import UserDropdown from "./UserDropdown.tsx";
-import { useMutation } from "@tanstack/react-query";
 import { createTask } from "../../../shared/services/api/task.ts";
-import useAuth from "../../../shared/utilities/hooks/useAuth.tsx";
 
 interface TaskFormProps {
   addTask: (task: Task) => void;
@@ -29,20 +28,13 @@ const TaskForm: React.FC<TaskFormProps> = ({
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const datePickerRef = useRef<DatePicker | null>(null);
 
-  const { user } = useAuth();
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
   const handlePlaceholderClick = () => {
     if (datePickerRef.current) {
       datePickerRef.current.setOpen(true);
     }
   };
-
-  // const users: User[] = [
-  //   { name: "John Doe", email: "john@example.com", id: 1545 },
-  //   { name: "Jane Smith", email: "jane@example.com", id: 1546 },
-  //   { name: "Alice Johnson", email: "alice@example.com", id: 1547 },
-  //   { name: "Bob Lee", email: "bob@example.com", id: 1548 },
-  // ];
 
   const handleUserSelect = (user: User): void => {
     setAssignee(user.firstName);
@@ -51,24 +43,15 @@ const TaskForm: React.FC<TaskFormProps> = ({
     setIsDropdownOpen(false);
   };
 
-  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
-
   const { mutate: mutateAddTask } = useMutation({
     mutationFn: createTask,
     onSuccess: (newTask: any) => {
-      console.log("newTask", newTask);
-
-      // Find the user in the users array by the assignee ID
       const assignedUser = users.find(
         (user: User) => user.id === newTask?.assignee?.id,
       );
 
-      if (!assignedUser) {
-        console.error("Assigned user not found!");
-        return;
-      }
+      if (!assignedUser) return;
 
-      // Create the updated task object
       const atask: Task = {
         ...newTask,
         assignee: {
@@ -80,9 +63,6 @@ const TaskForm: React.FC<TaskFormProps> = ({
         tempId: newTask.tempId,
       };
 
-      console.log("atask", atask);
-
-      // Call updateStatus with the updated task
       updateStatus(atask);
     },
   });
@@ -90,10 +70,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
   const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
 
-    if (!title.trim()) {
-      console.error("Task title is required!");
-      return;
-    }
+    if (!title.trim()) return;
 
     const newTask: Task = {
       title,
@@ -103,7 +80,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
       processing: true,
       tempId: Date.now(),
     };
-    console.log("newTaskdd", newTask);
+
     mutateAddTask(newTask);
     addTask(newTask);
     setTitle("");
@@ -127,7 +104,6 @@ const TaskForm: React.FC<TaskFormProps> = ({
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };

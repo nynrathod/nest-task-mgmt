@@ -10,13 +10,11 @@ export class RemindersProcessor {
   async handleReminder(job: Job): Promise<void> {
     const { taskId, assigneeId, title } = job.data;
 
-    // Log the start of processing the reminder
     console.log(
       `Processing reminder for task ${taskId} assigned to user ${assigneeId}`,
     );
 
     try {
-      // Send reminder to the assignee
       await this.remindersGateway.sendReminder(taskId, assigneeId, title);
       console.log(
         `Reminder sent successfully for task ${taskId} to user ${assigneeId}`,

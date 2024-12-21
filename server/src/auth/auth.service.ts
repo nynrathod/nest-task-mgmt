@@ -3,11 +3,11 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { plainToInstance } from 'class-transformer';
 import { SignupAuthDto } from './dto/signup-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { User } from './entities/user.entity';
 import { UserResponseDto } from './dto/user.dto';
-import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +20,6 @@ export class AuthService {
   async signup(signupDto: SignupAuthDto): Promise<User> {
     const { firstName, lastName, email, password } = signupDto;
 
-    // Check if user already exists
     const existingUser = await this.userRepository.findOne({
       where: { email },
     });
@@ -35,10 +34,8 @@ export class AuthService {
       );
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create and save the user
     const newUser = this.userRepository.create({
       firstName,
       lastName,
@@ -58,7 +55,6 @@ export class AuthService {
   }> {
     const { email, password } = loginDto;
 
-    // Find user by email
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
       throw new HttpException(
@@ -71,7 +67,6 @@ export class AuthService {
       );
     }
 
-    // Check password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new HttpException(
@@ -84,7 +79,6 @@ export class AuthService {
       );
     }
 
-    // Generate JWT
     const payload = {
       email: user.email,
       firstName: user.firstName,

@@ -14,7 +14,6 @@ export class TasksService {
     private readonly taskRepository: Repository<Task>,
   ) {}
 
-  // Create a new task
   async create(
     createTaskDto: CreateTaskDto,
     user: User,
@@ -43,8 +42,6 @@ export class TasksService {
     };
   }
 
-  // Get all tasks
-  // Assuming you have access to the current user's ID (e.g., via a request context or authentication token)
   async findAll(userId: number): Promise<any[]> {
     return await this.taskRepository
       .createQueryBuilder('task')
@@ -67,7 +64,6 @@ export class TasksService {
       .getMany();
   }
 
-  // Get task by ID
   async findOne(id: number): Promise<Task> {
     return await this.taskRepository.findOne({ where: { id } });
   }
@@ -76,20 +72,17 @@ export class TasksService {
     id: number,
     updateTaskDto: UpdateTaskDto,
   ): Promise<TaskWithTempId> {
-    // First, update the task in the database
     await this.taskRepository.update(id, {
       ...updateTaskDto,
-      assignee: updateTaskDto.assignee?.id, // Only store assignee's ID in the database
+      assignee: updateTaskDto.assignee?.id,
       updatedAt: new Date(),
     });
 
-    // Retrieve the updated task
-    const updatedTask = await this.findOne(id); // Assuming `findOne` fetches the task by its ID
+    const updatedTask = await this.findOne(id);
 
-    // Return the updated task with full assignee object and tempId
     return {
-      ...updatedTask, // Include all properties from the updated task
-      assignee: updateTaskDto.assignee, // Include the full assignee object in the response
+      ...updatedTask,
+      assignee: updateTaskDto.assignee,
     };
   }
 
@@ -102,12 +95,10 @@ export class TasksService {
   async updateStatus(id: number, status: boolean): Promise<Task> {
     const task = await this.taskRepository.findOne({ where: { id } });
 
-    if (!task) {
-      throw new Error('Task not found');
-    }
+    if (!task) throw new Error('Task not found');
 
-    task.status = status; // Set status
-    task.updatedAt = new Date(); // Update timestamp
+    task.status = status;
+    task.updatedAt = new Date();
 
     await this.taskRepository.save(task);
 
