@@ -23,9 +23,16 @@ updates.
 
 ---
 
-## **Setup and Run Locally**:
+## **Setup and Run**:
 
 ### **Client**:
+
+1. Create a `.env` file in the root of your client project.
+2. Add the following line to the `.env` file:
+
+```bash
+VITE_API_BASE_URL=http://localhost:3000/
+```
 
 ```bash
 $ cd client
@@ -34,6 +41,13 @@ $ npm run dev
 ```
 
 ### **Server**:
+
+1. Create a `.env` file in the root of your server project.
+2. Add the following line to the `.env` file:
+
+```bash
+JWT_SECRET=your-secret-key
+```
 
 ```bash
 $ cd server
