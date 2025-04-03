@@ -59,17 +59,9 @@
     <codeStyleSettings language="protobuf">
       <option name="SPACE_WITHIN_BRACKETS" value="true" />
       <option name="SPACE_WITHIN_BRACES" value="true" />
-      <indentOptions>
-        <option name="INDENT_SIZE" value="4" />
-        <option name="TAB_SIZE" value="4" />
-      </indentOptions>
     </codeStyleSettings>
     <codeStyleSettings language="prototext">
       <option name="SPACE_WITHIN_BRACKETS" value="true" />
-      <indentOptions>
-        <option name="INDENT_SIZE" value="4" />
-        <option name="TAB_SIZE" value="4" />
-      </indentOptions>
     </codeStyleSettings>
   </code_scheme>
 </component>
